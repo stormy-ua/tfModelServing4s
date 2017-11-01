@@ -189,4 +189,90 @@ closing TF model
 Program result = Success(())
 ```
 
-Example sources are [here](examples/src/main/scala/org/tfModelServing4s/examples/Example1.scala).
+The example sources are [here](examples/src/main/scala/org/tfModelServing4s/examples/Example1.scala).
+
+#### Example #2 (Dog Breed Classification)
+
+[This repo](https://github.com/stormy-ua/dog-breeds-classification) contains the description how to build dog breed classifier using pre-trained Inception model. 
+The final model gets exported as a "frozen" graph instead of a SavedModel format, though. [This script](https://github.com/stormy-ua/dog-breeds-classification/blob/master/src/freezing/frozen_to_saved_model.py) converts frozen model to SavedModel and could be used with this library.
+
+1. Follow steps to build dog breed classifier as described [here](https://github.com/stormy-ua/dog-breeds-classification/blob/master/README.md)
+2. Convert resulting "frozen" model to SavedModel format: 
+`python -m src.freezing.frozen_to_saved_model`
+3. Use the dog breed classifier saved model to classify an arbitrary dog image:
+
+```scala
+import scala.util.Try
+import tf._
+import tf.implicits._
+import dsl._
+import utils._
+import org.tfModelServing4s.utils.show._
+import org.tfModelServing4s.utils.show.implicits._
+import java.nio.file.{Files, Paths}
+
+object Example2 {
+
+  private def probsToClass(probs: Array[Float]): String = {
+    val classes = io.Source.fromInputStream(getClass.getResourceAsStream("/breeds.csv")).getLines().drop(1).toArray
+    val top5 = probs.zip(classes).sortBy { case (prob, idx) => prob }.reverse.take(5)
+
+    top5.mkString("\n")
+  }
+
+  def main(args: Array[String]): Unit = {
+
+    val imagePath = args(0)
+    val serving = new TFModelServing
+
+    val progr = for {
+      _ <- use(serving.load(FileModelSource("/tmp/dogs_1"), tag = "serve")) { model =>
+        for {
+          meta        <- serving.metadata(model)
+          _           =  println(s"model metadata: $meta")
+          signature   <- Try { meta.signatures("serving_default") }
+          _           =  println(s"serving signature: $signature")
+          _           =  println(s"serving signature inputs: ${signature.inputs}")
+          _           =  println(s"serving signature outputs: ${signature.outputs}")
+
+          inputArray  <- Try { Array.range(0, 6).map(_.toFloat) }
+          _           =  println(s"input array = ${shows(inputArray)}")
+
+          img         <- Try {
+            Files.readAllBytes(Paths.get(imagePath))
+          }
+          _           <- use(serving.tensor(img, shape = List(1))) { inputTensor =>
+            for {
+              inputDef    <- Try { signature.inputs("image_raw") }
+              outputDef   <- Try { signature.outputs("probs") }
+              outputArray <- serving.eval[Array[Array[Float]]](model, outputDef, Map(inputDef -> inputTensor))
+              _           =  println(s"output: ${shows(outputArray)}")
+              clazz       <- Try { probsToClass(outputArray.flatten) }
+              _           = println(clazz)
+            } yield ()
+          }
+
+        } yield ()
+      }
+    } yield ()
+
+    println(s"Program result = $progr")
+
+  }
+
+}
+```
+
+Here is the output for the [sample dog image](examples/src/main/resources/airedale.jpg): 
+
+```text 
+(0.9796268,3,airedale)
+(0.00985535,83,otterhound)
+(0.007160045,57,irish_terrier)
+(0.0015072817,28,chesapeake_bay_retriever)
+(8.2421233E-4,118,wire-haired_fox_terrier)
+```
+
+The model outputs probabilities array which gets mapped into top 5 breeds together with their probabilities. 
+
+The example source code is [here](examples/src/main/scala/org/tfModelServing4s/examples/Example2.scala).
