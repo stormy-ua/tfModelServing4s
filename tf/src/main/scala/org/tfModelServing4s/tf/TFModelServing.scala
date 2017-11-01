@@ -78,8 +78,8 @@ class TFModelServing extends ModelServing[Try] {
     reprT
   }
 
-  def close(model: TModel): Try[Unit] = Try {
-    model.bundle.session().close()
+  def close[A](resource: A)(implicit C: Closeable[A]): Try[Unit] = Try {
+    C.close(resource)
   }
 
   def tensor[TRepr](data: TRepr, shape: List[Long])(implicit E: TensorEncoder[TTensor, TRepr]): Try[TTensor] = Try {

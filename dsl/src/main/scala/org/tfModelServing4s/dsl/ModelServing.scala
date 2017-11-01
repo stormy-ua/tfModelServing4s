@@ -61,10 +61,10 @@ trait ModelServing[F[_]] {
                  (implicit D: TensorDecoder[TTensor, TRepr], C: Closeable[TTensor]): F[TRepr]
 
   /**
-    * Closes the model and releases all related resources.
+    * Closes a resource and releases all related resources.
     *
-    * @param model A model to close.
+    * @param resource A resource to close.
     * @return Unit.
     */
-  def close(model: TModel): F[Unit]
+  def close[A](resource: A)(implicit C: Closeable[A]): F[Unit]
 }
