@@ -6,7 +6,7 @@ object dependencies {
   def _provided (module: ModuleID): ModuleID = module % "provided"
 
   object Versions {
-    val tensorFlow = "1.1.0"
+    val tensorFlow = "1.3.0"
   }
 
   object tensorFlow {

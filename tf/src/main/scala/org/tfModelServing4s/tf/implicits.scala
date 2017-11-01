@@ -51,4 +51,14 @@ object implicits {
 
   }
 
+  implicit val closeableModel = new Closeable[TFModel] {
+
+    def close(resource: TFModel): Unit =  {
+
+      println("closing TF model")
+      resource.bundle.close()
+    }
+
+  }
+
 }
