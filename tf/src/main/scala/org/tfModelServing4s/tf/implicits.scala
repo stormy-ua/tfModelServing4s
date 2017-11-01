@@ -1,11 +1,18 @@
 package org.tfModelServing4s
 package tf
 
-import java.nio.FloatBuffer
+import java.nio.{ByteBuffer, FloatBuffer}
+
 import dsl._
-import org.tensorflow.Tensor
+import org.tensorflow.{DataType, Tensor}
 
 object implicits {
+
+  implicit val stringEncoder = new TensorEncoder[Tensor, Array[Byte]] {
+
+    def toTensor(data: Array[Byte], shape: List[Long]) =
+      Tensor.create(data)
+  }
 
   implicit val float1DimArrayEncoder = new TensorEncoder[Tensor, Array[Float]] {
 

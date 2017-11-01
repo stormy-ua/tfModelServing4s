@@ -29,8 +29,11 @@ class TFModelServing extends ModelServing[Try] {
   private def parseTensorInfo(opName: String, tensorInfo: TensorInfo) = {
 
     val shape = tensorInfo.getTensorShape.getDimList.asScala.map(_.getSize).toList
+    val name = tensorInfo.getName
+    val opName = name.split(":").head
 
-    TensorMetadata(name = tensorInfo.getName,
+
+    TensorMetadata(name = name,
       opName = opName,
       dataType = dTypesMap(tensorInfo.getDtype),
       shape = shape)
