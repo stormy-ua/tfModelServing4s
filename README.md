@@ -1,10 +1,13 @@
-### tfModelServing4s
+## tfModelServing4s
+
+![serving](images/serving.png)
+
 
 > Reasonable Scala API for serving TensorFlow models
 
 More details about the library could be found [here](https://medium.com/towards-data-science/serving-tensorflow-model-in-scala-6caeadbb2d55).
 
-#### API
+## API
 
 The core API algebra is agnostic to TensorFlow itself and could be used for binding to any TensorFlow-like library:
 
@@ -81,7 +84,7 @@ trait ModelServing[F[_]] {
 
 The binding for TensorFlow is implemented in [TFModelServing.scala](tf/src/main/scala/org/tfModelServing4s/tf/TFModelServing.scala).
 
-#### Example #1
+## Example #1
 
 1. Create a TensorFlow graph and save it using [Saved Model API](https://www.tensorflow.org/programmers_guide/saved_model):
 
@@ -195,7 +198,7 @@ Program result = Success(())
 
 The example sources are [here](examples/src/main/scala/org/tfModelServing4s/examples/Example1.scala).
 
-#### Example #2 (Dog Breed Classification)
+## Example #2 (Dog Breed Classification)
 
 [This repo](https://github.com/stormy-ua/dog-breeds-classification) contains the description how to build dog breed classifier using pre-trained Inception model. 
 The final model gets exported as a "frozen" graph instead of a SavedModel format, though. [This script](https://github.com/stormy-ua/dog-breeds-classification/blob/master/src/freezing/frozen_to_saved_model.py) converts frozen model to SavedModel and could be used with this library.
