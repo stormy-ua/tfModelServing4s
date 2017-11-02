@@ -1,4 +1,8 @@
-### Reasonable Scala API for serving TensorFlow models
+### tfModelServing4s
+
+> Reasonable Scala API for serving TensorFlow models
+
+More details about the library could be found [here](https://medium.com/towards-data-science/serving-tensorflow-model-in-scala-6caeadbb2d55).
 
 #### API
 
