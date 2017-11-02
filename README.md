@@ -1,6 +1,8 @@
 ## tfModelServing4s
 
-![serving](images/serving.png)
+<p align="center">
+  <img width="460" height="300" src="https://raw.githubusercontent.com/stormy-ua/tfModelServing4s/master/images/serving.png">
+</p>
 
 
 > Reasonable Scala API for serving TensorFlow models
